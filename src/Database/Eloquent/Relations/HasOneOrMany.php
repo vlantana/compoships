@@ -9,6 +9,30 @@ use Illuminate\Database\Eloquent\Model;
 trait HasOneOrMany
 {
     /**
+     * Constrained or relaxed chaining condition.
+     *
+     * @var string
+     */
+    private $boolean;
+
+    /**
+     * Create a new has one or many relationship instance.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @param  string  $foreignKey
+     * @param  string  $localKey
+     * @param  string  $boolean
+     * @return void
+     */
+    public function __construct(Builder $query, Model $parent, $foreignKey, $localKey, $boolean)
+    {
+        $this->boolean = $boolean;
+
+        parent::__construct($query, $parent, $foreignKey, $localKey);
+    }
+
+    /**
      * Set the base constraints on the relation query.
      *
      * @return void
@@ -25,8 +49,11 @@ trait HasOneOrMany
                     list(, $key) = explode('.', $key);
                     $fullKey = $this->getRelated()
                             ->getTable().'.'.$key;
-                    $this->query->where($fullKey, '=', $parentKeyValue[$index]);
-                    $this->query->whereNotNull($fullKey);
+                    $this->query->where(function($query) use ($fullKey, $parentKeyValue, $index){
+                        /** @var \Illuminate\Database\Query\Builder $query */
+                        $query->where($fullKey, '=', $parentKeyValue[$index]);
+                        $query->whereNotNull($fullKey);
+                    }, null, null, $this->boolean);
                 }
             } else {
                 $fullKey = $this->getRelated()

@@ -32,16 +32,20 @@ trait HasRelationships
 
         return $this->getTable().'.'.$keyName;
     }
-
+    
     /**
      * Define a one-to-one relationship.
      *
-     * @param  string  $related
-     * @param  string|array|null  $foreignKey
-     * @param  string|array|null  $localKey
+     * @param string            $related
+     * @param string|array|null $foreignKey
+     * @param string|array|null $localKey
+     *
+     * @param string            $boolean
+     *
      * @return \Awobaz\Compoships\Database\Eloquent\Relations\HasOne
+     * @throws \Awobaz\Compoships\Exceptions\InvalidUsageException
      */
-    public function hasOne($related, $foreignKey = null, $localKey = null)
+    public function hasOne($related, $foreignKey = null, $localKey = null, $boolean = 'and')
     {
         if (is_array($foreignKey)) { //Check for multi-columns relationship
             $this->validateRelatedModel($related);
@@ -63,7 +67,7 @@ trait HasRelationships
 
         $localKey = $localKey ?: $this->getKeyName();
 
-        return new HasOne($instance->newQuery(), $this, $foreignKeys ?: $foreignKey, $localKey);
+        return new HasOne($instance->newQuery(), $this, $foreignKeys ?: $foreignKey, $localKey, $boolean);
     }
 
     /**
@@ -82,16 +86,19 @@ trait HasRelationships
             throw new InvalidUsageException("The related model '${related}' must either extend 'Awobaz\Compoships\Database\Eloquent\Model' or use the 'Awobaz\Compoships\Compoships' trait");
         }
     }
-
+    
     /**
      * Define a one-to-many relationship.
      *
-     * @param  string  $related
-     * @param  string|array|null  $foreignKey
-     * @param  string|array|null  $localKey
+     * @param string            $related
+     * @param string|array|null $foreignKey
+     * @param string|array|null $localKey
+     * @param string            $boolean
+     *
      * @return \Awobaz\Compoships\Database\Eloquent\Relations\HasMany
+     * @throws \Awobaz\Compoships\Exceptions\InvalidUsageException
      */
-    public function hasMany($related, $foreignKey = null, $localKey = null)
+    public function hasMany($related, $foreignKey = null, $localKey = null, $boolean = 'and')
     {
         if (is_array($foreignKey)) { //Check for multi-columns relationship
             $this->validateRelatedModel($related);
@@ -113,17 +120,19 @@ trait HasRelationships
 
         $localKey = $localKey ?: $this->getKeyName();
 
-        return new HasMany($instance->newQuery(), $this, $foreignKeys ?: $foreignKey, $localKey);
+        return new HasMany($instance->newQuery(), $this, $foreignKeys ?: $foreignKey, $localKey, $boolean);
     }
-
+    
     /**
      * Define an inverse one-to-one or many relationship.
      *
-     * @param  string  $related
-     * @param  string|array|null  $foreignKey
-     * @param  string|array|null  $ownerKey
-     * @param  string  $relation
+     * @param string            $related
+     * @param string|array|null $foreignKey
+     * @param string|array|null $ownerKey
+     * @param string            $relation
+     *
      * @return \Awobaz\Compoships\Database\Eloquent\Relations\BelongsTo
+     * @throws \Awobaz\Compoships\Exceptions\InvalidUsageException
      */
     public function belongsTo($related, $foreignKey = null, $ownerKey = null, $relation = null)
     {

@@ -53,6 +53,7 @@ If for some reasons you can't derive your models from `Awobaz\Compoships\Databas
 ### Syntax
 
 ... and now we can define a relationship from a model *A* to another model *B* by matching two or more columns (by passing an array of columns instead of a string). 
+Optionally we can pass a third parameter to define constrained or relaxed multiple key relation.
 
 ```php
 namespace App;
@@ -65,7 +66,7 @@ class A extends Model
     
     public function b()
     {
-        return $this->hasMany('B', ['f1', 'f2'], ['l1', 'l2']);
+        return $this->hasMany('B', ['f1', 'f2'], ['l1', 'l2'], 'or');
     }
 }
 ```
